@@ -1,0 +1,14 @@
+version: '2.4'
+services:
+  db:
+    image: mysql
+    container_name: mysqlCrud
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - crud_data:/var/lib/mysql
+
+volumes:
+  crud_data:

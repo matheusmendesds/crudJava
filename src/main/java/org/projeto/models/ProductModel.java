@@ -6,6 +6,7 @@ import lombok.Builder;
 public class ProductModel {
     private int id;
     private String productName;
+    private double price;
     private ProductType type;
 
     @Override

@@ -20,7 +20,6 @@ public class ImportCsv {
             while ((linha = br.readLine()) != null) {
 
                 String[] d = linha.split(",");
-                System.out.println("LINHA: [" + linha + "]");
                 int i = 0;
                 ps.setString(++i,d[0]);
                 ps.setInt(++i,Integer.parseInt(d[1]));

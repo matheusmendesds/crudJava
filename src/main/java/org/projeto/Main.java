@@ -1,38 +1,45 @@
 package org.projeto;
 
 import org.projeto.conn.ConnectionFactory;
+import org.projeto.services.PlayerService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
-        testNomeTime("2TM");
-    }
+    private static final Scanner SCANNER = new Scanner(System.in);
 
-    public static void testNomeTime(String name) {
-        try (Connection conn = ConnectionFactory.getConnection()){
-            PreparedStatement ps = testeSql(conn,name);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                System.out.println("Player: " + rs.getString("player_name"));
-                System.out.println("Team: " + rs.getString("team"));
-                System.out.println("Points per Game: " + rs.getString("pts"));
-                System.out.println("---------------------");
+    public static void main(String[] args) throws SQLException {
+        int option;
+        while (true) {
+            menu();
+            option = Integer.parseInt(SCANNER.nextLine());
+            if (option == 0) break;
+            switch (option) {
+                case 1 -> {
+                    playerMenu();
+                    option = Integer.parseInt(SCANNER.nextLine());
+                    PlayerService.menu(option);
+
+                }
             }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+
         }
-
     }
 
-    private static PreparedStatement testeSql(Connection conn , String name) throws SQLException {
-        String sql = "select * from dados.player_stats WHERE team LIKE ? ;";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, "%" + name + "%");
-        return ps;
+    private static void menu() {
+        System.out.println("-----Database NBA----");
+        System.out.println("Find informations here");
+        System.out.println("1-Options");
+        System.out.println("0-Exit");
     }
+
+    private static void playerMenu() {
+        System.out.println("1-Find player by name");
+    }
+
 }

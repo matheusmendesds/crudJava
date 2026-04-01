@@ -9,6 +9,7 @@ public class PlayerService {
     public static void menu(int option){
         switch (option) {
             case 1 -> findByName();
+            case 2 -> delete();
         }
     }
     public static void findByName() {
@@ -17,5 +18,14 @@ public class PlayerService {
         PlayerRepository.findByName(name)
                 .forEach(p-> System.out.printf("[%d] - %s%n",p.getId(),p.getPlayer_name()));
 
+    }
+    public static void delete() {
+        System.out.println("Type the id of the player you want to delete");
+        int id = Integer.parseInt(SCANNER.nextLine());
+        System.out.println("Are you sure? S/N");
+        String choice = SCANNER.nextLine();
+        if ("s".equalsIgnoreCase(choice)) {
+            PlayerRepository.delete(id);
+        }
     }
 }

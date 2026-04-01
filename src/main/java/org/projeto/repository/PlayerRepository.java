@@ -46,10 +46,27 @@ public class PlayerRepository {
         return playerList;
     }
 
-    public static PreparedStatement createdPreparedStatementFindByName(Connection conn, String name) throws SQLException {
+    private static PreparedStatement createdPreparedStatementFindByName(Connection conn, String name) throws SQLException {
         String sql = "SELECT * FROM dados.player_stats WHERE player_name LIKE ?;";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, String.format("%%%s%%", name));
         return ps;
+    }
+    public static void delete(int id) {
+        try(Connection conn = ConnectionFactory.getConnection();
+        PreparedStatement ps = cretedPreparedStatementDelete(conn,id)) {
+            ps.execute();
+            log.info("Deleted player data '{}' from the database", id);
+        } catch (SQLException e) {
+            log.error("Error while trying to delete player '{}'", id, e);
+        }
+    }
+    private static PreparedStatement cretedPreparedStatementDelete(Connection conn , int id) throws SQLException {
+        String sql = "DELETE FROM `dados`.`player_stats` WHERE (`id` = ?);";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1,id);
+        return ps;
+
+
     }
 }

@@ -54,19 +54,48 @@ public class PlayerRepository {
     }
     public static void delete(int id) {
         try(Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = cretedPreparedStatementDelete(conn,id)) {
+        PreparedStatement ps = createdPreparedStatementDelete(conn,id)) {
             ps.execute();
             log.info("Deleted player data '{}' from the database", id);
         } catch (SQLException e) {
             log.error("Error while trying to delete player '{}'", id, e);
         }
     }
-    private static PreparedStatement cretedPreparedStatementDelete(Connection conn , int id) throws SQLException {
+    private static PreparedStatement createdPreparedStatementDelete(Connection conn , int id) throws SQLException {
         String sql = "DELETE FROM `dados`.`player_stats` WHERE (`id` = ?);";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setInt(1,id);
         return ps;
+    }
+    public static void save(PlayerModel player) {
+        log.info("Saving Producer '{}'", player);
+        try (Connection conn = ConnectionFactory.getConnection();
+        PreparedStatement ps = createdPreparedStatementSave(conn,player)){
+            ps.execute();
 
+        } catch (SQLException e) {
+            log.error("Error while trying to save player '{}'", player.getId(), e);
+        }
 
     }
+    private static PreparedStatement createdPreparedStatementSave(Connection conn, PlayerModel player) throws SQLException {
+        String sql = "INSERT INTO `dados`.`player_stats` (`player_name`, `age`, `team`, `position`, `games`, `games_started`, `minutes`, `pts`, `ast`, `orb`, `drb`, `trb`, `stl`, `blk`) VALUES (?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?,?, ?);";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1,player.getPlayer_name());
+        ps.setInt(2,player.getAge());
+        ps.setString(3,player.getTeam());
+        ps.setString(4,player.getPosition());
+        ps.setInt(5,player.getGames());
+        ps.setInt(6,player.getGames_started());
+        ps.setDouble(7,player.getMinutes());
+        ps.setDouble(8,player.getPts());
+        ps.setDouble(9,player.getAst());
+        ps.setDouble(10,player.getOrb());
+        ps.setDouble(11,player.getDrb());
+        ps.setDouble(12,player.getTrb());
+        ps.setDouble(13,player.getStl());
+        ps.setDouble(14,player.getBlk());
+        return ps;
+    }
+
 }

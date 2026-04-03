@@ -41,6 +41,7 @@ public class Main {
     private static void playerMenu() {
         System.out.println("1-Find player by name");
         System.out.println("2-Delete player by Id");
+        System.out.println("3-Save new player");
 
     }
 

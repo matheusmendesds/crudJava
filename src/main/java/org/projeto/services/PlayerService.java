@@ -75,6 +75,9 @@ public class PlayerService {
                 .blk(blk)
                 .build();
         PlayerRepository.save(playerModel);
+    }
 
+    public static void update() {
+        System.out.println("Which player do you want to update?");
     }
 }

@@ -98,4 +98,34 @@ public class PlayerRepository {
         return ps;
     }
 
+    public static void updatePlayerStats(PlayerModel playerModel) {
+        try (Connection conn = ConnectionFactory.getConnection();
+        PreparedStatement ps = createdPreparedStatementUpdate(conn,playerModel)){
+            ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static PreparedStatement createdPreparedStatementUpdate(Connection conn,PlayerModel player) throws SQLException {
+        String sql = "UPDATE `dados`.`player_stats` SET `player_name` = ?, `age` = ?, `team` = ?, `position` = ?, `games` = ?, `games_started` = ?, `minutes` = ?, `pts` = ?, `ast` = ?, `orb` = ?, `drb` = ?, `trb` = ?, `stl` = ?, `blk` = ? WHERE (`id` = ?);";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, player.getPlayer_name());
+        ps.setInt(2, player.getAge());
+        ps.setString(3, player.getTeam());
+        ps.setString(4, player.getPosition());
+        ps.setDouble(5, player.getGames());
+        ps.setDouble(6, player.getGames_started());
+        ps.setDouble(7, player.getMinutes());
+        ps.setDouble(8, player.getPts());
+        ps.setDouble(9, player.getAst());
+        ps.setDouble(10, player.getOrb());
+        ps.setDouble(11, player.getDrb());
+        ps.setDouble(12, player.getTrb());
+        ps.setDouble(13, player.getStl());
+        ps.setDouble(14, player.getBlk());
+        ps.setInt(15, player.getId());
+        return ps;
+    }
+
 }

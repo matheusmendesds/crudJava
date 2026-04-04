@@ -10,14 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 public class PlayerRepository {
     public static List<PlayerModel> findByName(String name) {
         List<PlayerModel> playerList = new ArrayList<>();
-        try(Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = createdPreparedStatementFindByName(conn,name);
-            ResultSet rs = ps.executeQuery();) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = createdPreparedStatementFindByName(conn, name);
+             ResultSet rs = ps.executeQuery();) {
             while (rs.next()) {
                 PlayerModel player = PlayerModel.builder()
                         .id(rs.getInt("id"))
@@ -52,25 +53,28 @@ public class PlayerRepository {
         ps.setString(1, String.format("%%%s%%", name));
         return ps;
     }
+
     public static void delete(int id) {
-        try(Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = createdPreparedStatementDelete(conn,id)) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = createdPreparedStatementDelete(conn, id)) {
             ps.execute();
             log.info("Deleted player data '{}' from the database", id);
         } catch (SQLException e) {
             log.error("Error while trying to delete player '{}'", id, e);
         }
     }
-    private static PreparedStatement createdPreparedStatementDelete(Connection conn , int id) throws SQLException {
+
+    private static PreparedStatement createdPreparedStatementDelete(Connection conn, int id) throws SQLException {
         String sql = "DELETE FROM `dados`.`player_stats` WHERE (`id` = ?);";
         PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1,id);
+        ps.setInt(1, id);
         return ps;
     }
+
     public static void save(PlayerModel player) {
         log.info("Saving Producer '{}'", player);
         try (Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = createdPreparedStatementSave(conn,player)){
+             PreparedStatement ps = createdPreparedStatementSave(conn, player)) {
             ps.execute();
 
         } catch (SQLException e) {
@@ -78,36 +82,37 @@ public class PlayerRepository {
         }
 
     }
+
     private static PreparedStatement createdPreparedStatementSave(Connection conn, PlayerModel player) throws SQLException {
         String sql = "INSERT INTO `dados`.`player_stats` (`player_name`, `age`, `team`, `position`, `games`, `games_started`, `minutes`, `pts`, `ast`, `orb`, `drb`, `trb`, `stl`, `blk`) VALUES (?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?,?, ?);";
         PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1,player.getPlayer_name());
-        ps.setInt(2,player.getAge());
-        ps.setString(3,player.getTeam());
-        ps.setString(4,player.getPosition());
-        ps.setInt(5,player.getGames());
-        ps.setInt(6,player.getGames_started());
-        ps.setDouble(7,player.getMinutes());
-        ps.setDouble(8,player.getPts());
-        ps.setDouble(9,player.getAst());
-        ps.setDouble(10,player.getOrb());
-        ps.setDouble(11,player.getDrb());
-        ps.setDouble(12,player.getTrb());
-        ps.setDouble(13,player.getStl());
-        ps.setDouble(14,player.getBlk());
+        ps.setString(1, player.getPlayer_name());
+        ps.setInt(2, player.getAge());
+        ps.setString(3, player.getTeam());
+        ps.setString(4, player.getPosition());
+        ps.setInt(5, player.getGames());
+        ps.setInt(6, player.getGames_started());
+        ps.setDouble(7, player.getMinutes());
+        ps.setDouble(8, player.getPts());
+        ps.setDouble(9, player.getAst());
+        ps.setDouble(10, player.getOrb());
+        ps.setDouble(11, player.getDrb());
+        ps.setDouble(12, player.getTrb());
+        ps.setDouble(13, player.getStl());
+        ps.setDouble(14, player.getBlk());
         return ps;
     }
 
     public static void updatePlayerStats(PlayerModel playerModel) {
         try (Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = createdPreparedStatementUpdate(conn,playerModel)){
+             PreparedStatement ps = createdPreparedStatementUpdate(conn, playerModel)) {
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static PreparedStatement createdPreparedStatementUpdate(Connection conn,PlayerModel player) throws SQLException {
+    private static PreparedStatement createdPreparedStatementUpdate(Connection conn, PlayerModel player) throws SQLException {
         String sql = "UPDATE `dados`.`player_stats` SET `player_name` = ?, `age` = ?, `team` = ?, `position` = ?, `games` = ?, `games_started` = ?, `minutes` = ?, `pts` = ?, `ast` = ?, `orb` = ?, `drb` = ?, `trb` = ?, `stl` = ?, `blk` = ? WHERE (`id` = ?);";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, player.getPlayer_name());
@@ -125,6 +130,41 @@ public class PlayerRepository {
         ps.setDouble(13, player.getStl());
         ps.setDouble(14, player.getBlk());
         ps.setInt(15, player.getId());
+        return ps;
+    }
+
+    public static Optional<PlayerModel> findById(int id) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = createdPreparedStatementFindById(conn, id);
+             ResultSet rs = ps.executeQuery();) {
+            if (!rs.next()) return Optional.empty();
+            return Optional.of(PlayerModel
+                    .builder()
+                    .id(rs.getInt("id"))
+                    .player_name(rs.getString("player_name"))
+                    .age(rs.getInt("age"))
+                    .team(rs.getString("team"))
+                    .position(rs.getString("position"))
+                    .games(rs.getInt("games"))
+                    .games_started(rs.getInt("games_started"))
+                    .minutes(rs.getDouble("minutes"))
+                    .pts(rs.getDouble("pts"))
+                    .ast(rs.getDouble("ast"))
+                    .orb(rs.getDouble("orb"))
+                    .drb(rs.getDouble("drb"))
+                    .trb(rs.getDouble("trb"))
+                    .stl(rs.getDouble("stl"))
+                    .blk(rs.getDouble("blk"))
+                    .build());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static PreparedStatement createdPreparedStatementFindById(Connection conn, int id) throws SQLException {
+        String sql = "SELECT * FROM dados.player_stats WHERE id = ?;";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, id);
         return ps;
     }
 
